@@ -1,7 +1,37 @@
 ﻿@page "/"
+@inject HttpClient client
 
 <h1>Hello, world!</h1>
 
 Welcome to your new app.
 
 <SurveyPrompt Title="How is Blazor working for you?" />
+@functions  {
+
+    private int x;
+
+    // Not working. And producing [WASM]: 13
+    protected override void OnInit()
+    {
+        // For sure without GetAwaiter().GetResult(); works
+        var x = GetTaskAsync().GetAwaiter().GetResult();
+        base.OnInit();
+    }
+
+    // This is working as well.
+    //protected override async Task OnInitAsync()
+    //{
+    //    var x = await GetTaskAsync();
+    //    await base.OnInitAsync();
+    //}
+
+    async Task<int> GetTaskAsync()
+    {
+        // Fails
+        await client.GetAsync("index.html");
+        return 0;
+
+        // Works
+        // return Task.FromResult(0);
+    }
+}
